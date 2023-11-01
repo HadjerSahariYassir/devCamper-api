@@ -3,12 +3,18 @@ const dotenv = require("dotenv")
 
 //load router files
 const bootcamps = require("./routes/bootcamps")
+//load logger middleware
+const morgan = require("morgan")
 
 //load env vars
 dotenv.config({ path : "./config/config.env"})
 
 const app = express()
 
+//logger middleware
+if(process.env.NODE_ENV === 'development'){
+  app.use(morgan('dev'));
+}
 //Mounr routers
 app.use("/api/v1/bootcamps", bootcamps)
 

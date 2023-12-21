@@ -16,7 +16,9 @@ const bootcamps = require("./routes/bootcamps");
 const app = express();
 
 //Dev loading middleware
-app.use(morgan("dev"));
+if(process.env.NODE_ENV === 'development'){
+  app.use(morgan('dev'));
+}
 //Mounr routers
 app.use("/api/v1/bootcamps", bootcamps);
 

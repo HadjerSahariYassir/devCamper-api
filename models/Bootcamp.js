@@ -23,8 +23,15 @@ const BootcampSchema = new mongoose.Schema({
      ]
     },
     phone: {
-        type: Number,
-        maxLength: [20, 'Please add valid number']
+        type: String,
+        maxLength: [20, 'Phone number can not be longer than 20 Characteres']
+    },
+    email: {
+        type: String,
+        match: [
+            /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
+            'Please add a valid Email'
+        ]
     },
     address: {
         type: String,
@@ -35,13 +42,14 @@ const BootcampSchema = new mongoose.Schema({
         type: {
             type: String, // Don't do `{ location: { type: String } }`
             enum: ['Point'], // 'location.type' must be 'Point'
-            required: true
+            required: false
           },
           coordinates: {
             type: [Number],
-            required: true,
+            required: false,
             index: "2dsphere"
-          }
+          },
+          
     },
     formatedAddress: String,
     street: String,

@@ -37,7 +37,7 @@ const BootcampSchema = new mongoose.Schema({
     },
     address: {
         type: String,
-        required: [true, 'Please add an address']
+       // required: [true, 'Please add an address']
     },
     location: {
         //GeoJson point
@@ -109,8 +109,18 @@ const BootcampSchema = new mongoose.Schema({
     createdAt: {
         type: Date,
         default: Date.now
+    },
+    user: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User',
+        required: true
     }
+}, {
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
 })
+
+
 
 BootcampSchema.pre('save', function(next){
     console.log("we are inside slug", this.name);
@@ -119,7 +129,7 @@ BootcampSchema.pre('save', function(next){
 })
 
 //Geocode & create location field
-BootcampSchema.pre('save', async function(next){
+/*BootcampSchema.pre('save', async function(next){
     const loc = await geocoder.geocode(this.address);
     console.log('loc', loc)
     this.location = {
@@ -127,14 +137,29 @@ BootcampSchema.pre('save', async function(next){
         coordinates: [loc[0].longitude, loc[0].latitude],
         formattedAddress: loc[0].formattedAddress, 
         street: loc[0].streetName,
-        city: loc[0].city,
+        city: loc[0].city,  
         state: loc[0].stateCode,
         zipcode: loc[0].zipcode,
-        county: loc[0].countryCode
+        county: loc[0].countryCode 
     }
     //Do not save address in DB
     this.address = undefined;
     next();
+})*/
+
+// Remove courses of the deleted bootcamp
+BootcampSchema.pre('deleteOne', { document: true, query: false }, async function (next) {
+    await this.model('Course').deleteMany({ bootcamp: this._id});
+    console.log(" delete course when bootcamp" )
+    next();
 })
+// Reverse populate with virtuals
+BootcampSchema.virtual('courses', {
+    ref: 'Course',
+    localField: '_id',
+    foreignField: 'bootcamp',
+    justOne: false
+}) 
+
 
 module.exports = mongoose.model('Bootcamp', BootcampSchema);
